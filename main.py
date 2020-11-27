@@ -1,4 +1,4 @@
-'''
+"""
 JSON 2 HTML convertor
 =====================
 
@@ -10,11 +10,14 @@ Source Code: https://github.com/softvar/json2html-flask
 
 LICENSE: MIT
 --------
-'''
+"""
 # -*- coding: utf-8 -*-
 
-import ordereddict
-import HTMLParser
+# import ordereddict
+# import HTMLParser
+from collections import OrderedDict
+from html.parser import HTMLParser
+
 
 from flask import json
 from flask import Flask
@@ -25,88 +28,94 @@ app = Flask(__name__)
 
 a = ''
 
+
 @app.route('/')
 def my_form():
     return render_template("index.html")
 
+
 @app.route('/', methods=['POST'])
 def my_form_post():
-    '''
+    """
     receive submitted data and process
-    '''
+    """
     text = request.form['text']
     checkbox = request.form['users']
-    style=""
-    if(checkbox=="1"):
-    	style="<table class=\"table table-condensed table-bordered table-hover\">"
+    style = ""
+    if checkbox == "1":
+        style = "<table class=\"table table-condensed table-bordered table-hover\">"
     else:
-    	style="<table border=\"1\">"
+        style = "<table border=\"1\">"
 
-    #json_input = json.dumps(text)
+    # json_input = json.dumps(text)
     try:
-        ordered_json = json.loads(text, object_pairs_hook=ordereddict.OrderedDict)
-        print ordered_json
-        processed_text = htmlConvertor(ordered_json,style)
+        ordered_json = json.loads(text, object_pairs_hook=OrderedDict)
+        print(ordered_json)
+        processed_text = html_convertor(ordered_json, style)
 
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = HTMLParser()
         global a
         a = ''
-        return render_template("index.html", processed_text=html_parser.unescape(processed_text),pro = text)
-    except:
-        return render_template("index.html",error="Error Parsing JSON ! Please check your JSON syntax",pro=text)
+        return render_template("index.html", processed_text=html_parser.unescape(processed_text), pro=text)
+    except Exception as e:
+        return render_template("index.html", error=f"Error Parsing JSON ! Please check your JSON syntax: {str(e)}", pro=text)
 
-def iterJson(ordered_json,style):
-	global a
-	a=a+ style
-	for k,v in ordered_json.iteritems():
-		a=a+ '<tr>'
-		a=a+ '<th>'+ str(k) +'</th>'
-		if (v==None):
-			v = unicode("")
-		if(isinstance(v,list)):
-			a=a+ '<td><ul>'
-			for i in range(0,len(v)):
-				if(isinstance(v[i],unicode)):
-					a=a+ '<li>'+unicode(v[i])+'</li>'
-				elif(isinstance(v[i],int) or isinstance(v,float)):
-					a=a+ '<li>'+str(v[i])+'</li>'
-				elif(isinstance(v[i],list)==False):
-					iterJson(v[i],style)
-			a=a+ '</ul></td>'
-			a=a+ '</tr>'
-		elif(isinstance(v,unicode)):
-			a=a+ '<td>'+ unicode(v) +'</td>'
-			a=a+ '</tr>'
-		elif(isinstance(v,int) or isinstance(v,float)):
-			a=a+ '<td>'+ str(v) +'</td>'
-			a=a+ '</tr>'
-		else:
-			a=a+ '<td>'
-			#a=a+ '<table border="1">'
-			iterJson(v,style)
-			a=a+ '</td></tr>'
-	a=a+ '</table>'
-def htmlConvertor(ordered_json,style):
-	'''
-	converts JSON Object into human readable HTML representation
-	generating HTML table code with raw/bootstrap styling.
-	'''
-	global a
-	try:
-		for k,v in ordered_json.iteritems():
-			pass
-		iterJson(ordered_json,style)
 
-	except:
-		for i in range(0,len(ordered_json)):
-			if(isinstance(ordered_json[i],unicode)):
-				a=a+ '<li>'+unicode(ordered_json[i])+'</li>'
-			elif(isinstance(ordered_json[i],int) or isinstance(ordered_json[i],float)):
-				a=a+ '<li>'+str(ordered_json[i])+'</li>'
-			elif(isinstance(ordered_json[i],list)==False):
-				htmlConvertor(ordered_json[i],style)
+def iter_json(ordered_json, style):
+    global a
+    a = a + style
+    for k, v in ordered_json.items():
+        a = a + '<tr>'
+        a = a + '<th>' + str(k) + '</th>'
+        if v is None:
+            v = str("")
+        if isinstance(v, list):
+            a = a + '<td><ul>'
+            for i in range(0, len(v)):
+                if isinstance(v[i], str):
+                    a = a + '<li>' + str(v[i]) + '</li>'
+                elif isinstance(v[i], int) or isinstance(v[i], float):
+                    a = a + '<li>' + str(v[i]) + '</li>'
+                elif not isinstance(v[i], list):
+                    iter_json(v[i], style)
+            a = a + '</ul></td>'
+            a = a + '</tr>'
+        elif isinstance(v, str):
+            a = a + '<td>' + str(v) + '</td>'
+            a = a + '</tr>'
+        elif isinstance(v, int) or isinstance(v, float):
+            a = a + '<td>' + str(v) + '</td>'
+            a = a + '</tr>'
+        else:
+            a = a + '<td>'
+            # a=a+ '<table border="1">'
+            iter_json(v, style)
+            a = a + '</td></tr>'
+    a = a + '</table>'
 
-	return a
+
+def html_convertor(ordered_json, style):
+    """
+    converts JSON Object into human readable HTML representation
+    generating HTML table code with raw/bootstrap styling.
+    """
+    global a
+    try:
+        for k, v in ordered_json.items():
+            pass
+        iter_json(ordered_json, style)
+
+    except Exception as e:
+        for idx, val in enumerate(ordered_json):
+            if isinstance(val, str):
+                a = a + '<li>' + str(val) + '</li>'
+            elif isinstance(val, int) or isinstance(val, float):
+                a = a + '<li>' + str(val) + '</li>'
+            elif not isinstance(val, list):
+                html_convertor(val, style)
+
+    return a
+
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug=True)
