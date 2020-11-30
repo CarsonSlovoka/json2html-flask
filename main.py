@@ -17,16 +17,35 @@ LICENSE: MIT
 # import HTMLParser
 from collections import OrderedDict
 from html.parser import HTMLParser
-
+import html
 
 from flask import json
 from flask import Flask
 from flask import request
-from flask import render_template
+from flask import render_template as flask_renter_template
 
-app = Flask(__name__)
+from pathlib import Path
+
+app = Flask(__name__,
+            static_folder=str(Path(__file__).parent / Path('static')),
+            template_folder=str(Path(__file__).parent / Path('templates')),
+            )
 
 a = ''
+
+app.config.update(
+    dict(
+        PAGE_SETTING=
+        dict(github_url='https://github.com/CarsonSlovoka/json2html-flask',
+             stackoverflow_url='https://stackoverflow.com/users/9935654/carson?tab=profile',
+             display_disqus=False,
+             disqus_short_name='json2html-1')
+    ))
+
+
+def render_template(*args, **kwargs):
+    kwargs.update(app.config['PAGE_SETTING'])
+    return flask_renter_template(*args, **kwargs)
 
 
 @app.route('/')
@@ -56,7 +75,7 @@ def my_form_post():
         html_parser = HTMLParser()
         global a
         a = ''
-        return render_template("index.html", processed_text=html_parser.unescape(processed_text), pro=text)
+        return render_template("index.html", processed_text=html.unescape(processed_text), pro=text)
     except Exception as e:
         return render_template("index.html", error=f"Error Parsing JSON ! Please check your JSON syntax: {str(e)}", pro=text)
 
