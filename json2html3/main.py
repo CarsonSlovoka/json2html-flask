@@ -11,12 +11,7 @@ Source Code: https://github.com/softvar/json2html-flask
 LICENSE: MIT
 --------
 """
-# -*- coding: utf-8 -*-
-
-# import ordereddict
-# import HTMLParser
 from collections import OrderedDict
-from html.parser import HTMLParser
 import html
 
 from flask import json
@@ -71,10 +66,8 @@ def my_form_post():
         ordered_json = json.loads(text, object_pairs_hook=OrderedDict)
         print(ordered_json)
         processed_text = html_convertor(ordered_json, style)
-
-        html_parser = HTMLParser()
         global a
-        a = ''
+        a = ''  # Clear so that it can be reused the next time.
         return render_template("index.html", processed_text=html.unescape(processed_text), pro=text)
     except Exception as e:
         return render_template("index.html", error=f"Error Parsing JSON ! Please check your JSON syntax: {str(e)}", pro=text)
