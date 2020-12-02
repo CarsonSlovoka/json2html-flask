@@ -18,8 +18,12 @@ app.config.update(
         PAGE_SETTING=dict(
             github_url='https://github.com/CarsonSlovoka/json2html-flask',
             stackoverflow_url='https://stackoverflow.com/users/9935654/carson?tab=profile',
-            display_disqus=False,
-            disqus_short_name='json2html-1')
+            disqus=dict(
+                show=False,
+                language='en',  # en, zh-TW
+                disqus_short_name='json2html-1'
+            ),
+        )
     ))
 
 
