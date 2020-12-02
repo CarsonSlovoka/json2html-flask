@@ -26,7 +26,7 @@ class HTMLConvertor:
     def table_style(self) -> str:
         return self._table_style
 
-    def _iter_json(self, dict_json: Union[OrderedDict, Dict]) -> str:
+    def _iter_json(self, dict_json: Dict) -> str:
         with add_html_tag(self.table_style) as _:
             html_string, table = _  # type: ValueHolder, list
             for k, v in dict_json.items():
@@ -37,33 +37,39 @@ class HTMLConvertor:
 
                     if isinstance(v, (str, int, float)):
                         tr.append(f'<td>{v}</td>')
-                    elif isinstance(v, (Dict, OrderedDict)):
+                    elif isinstance(v, Dict):
                         tr.append(f'<td>{self._iter_json(v)}</td>')
                     elif isinstance(v, list):
-                        with add_html_tag('<td><ul>') as (tudl_, tdul):
-                            for e in v:
+                        with add_html_tag('<td><ul>') as (tudl_, tdul):  # <td><ol>
+                            for idx, e in enumerate(v):
+                                idx += 1
                                 if isinstance(e, (str, float, int)):
                                     tdul.append(f'<li>{e}</li>')
-                                else:  # is dict
-                                    self._iter_json(e)
+                                elif isinstance(e, Dict):
+                                    tdul.append(self._iter_json(e))
+                                elif isinstance(e, List):
+                                    tdul.append(self._iter_json({f'{idx}.': e}))
                         tr.append(tudl_.data)
                 table.append(tr_.data)
         return html_string.data
 
-    def convert(self, current_result: Union[List, OrderedDict, str] = None) -> str:
+    def convert(self, current_result: Union[List, Dict] = None) -> str:
         source = self.obj_source if current_result is None else current_result
 
         html_string = ''
-        if isinstance(source, OrderedDict):
+        if isinstance(source, Dict):
             """ do some modify if you want.
             for k, v in source.items():
                 ...
             """
             html_string = self._iter_json(source)
         elif isinstance(source, List):
-            for val in source:
+            for idx, val in enumerate(source):
+                idx += 1
                 if isinstance(val, (str, int, float)):
                     html_string += f'<li>{str(val)}</li>'
-                elif isinstance(val, (Dict, OrderedDict)):
-                    html_string += self.convert(val)
+                elif isinstance(val, Dict):
+                    html_string += self.convert({f'{idx}.': self.convert(val)})
+                elif isinstance(val, List):
+                    html_string += self.convert({f'{idx}.': val})  # change value to dict
         return html_string
