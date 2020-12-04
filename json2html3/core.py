@@ -5,6 +5,7 @@ from flask import request
 from flask import render_template as flask_renter_template
 
 from .api.convertor import HTMLConvertor
+from .api.flask_helper import shutdown_server
 
 from pathlib import Path
 
@@ -15,6 +16,7 @@ app = Flask(__name__,
 
 app.config.update(
     dict(
+        IS_RELEASE=False,
         PAGE_SETTING=dict(
             github_url='https://github.com/CarsonSlovoka/json2html-flask',
             stackoverflow_url='https://stackoverflow.com/users/9935654/carson?tab=profile',
@@ -54,6 +56,22 @@ def my_form_post():
         return render_template("index.html", processed_text=html.unescape(conv.convert()), pro=text)
     except Exception as e:
         return render_template("index.html", error=f"Error Parsing JSON ! Please check your JSON syntax: {str(e)}", pro=text)
+
+
+@app.route('/shutdown', methods=['Get'])
+def shutdown():
+    if app.config['IS_RELEASE']:
+        return
+    shutdown_server()
+    return 'Server shutting down...'
+
+
+# background process happening without any refreshing
+@app.route('/background_process_test')
+def background_process_test():
+    shutdown_server()
+    print('Server shutting down...')
+    return 'Server shutting down...'
 
 
 def main():

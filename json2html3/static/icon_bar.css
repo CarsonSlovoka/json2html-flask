@@ -1,0 +1,25 @@
+.icon-bar {
+  position: fixed;
+  right: 10px;
+  top: 30%;
+  width: 45px;
+  background-color: #555;
+  z-index: 1000;
+}
+
+.icon-bar a {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  transition: all 0.5s ease;
+  color: white;
+  font-size: 24px;
+}
+
+.icon-bar a:hover {
+  background-color: #000;
+}
+
+.icon-bar .danger:hover {
+  background-color: #FF0000;
+}

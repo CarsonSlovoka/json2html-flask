@@ -2,13 +2,41 @@
 <html lang="en">
 <head>
   <title>JSON2HTML| HOME</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"/>
+  <!--
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='font-awesome/css/font-awesome.min.css') }}"/>
+  -->
+  <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}"/>
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icon_bar.css') }}"/>
   <script defer type="text/javascript" src="{{ url_for('static', filename='convert.js') }}"></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event -->
+  <script type=text/javascript src="{{ url_for('static', filename='icon_bar.js') }}"></script>
 </head>
 
+
 <body onload="process()">
+
+<div class="icon-bar">
+  <a class="danger" href="#"><i class="fa fa-power-off"></i></a>
+  <a class="active" href="#"><i class="fa fa-home"></i></a>
+</div>
+
+<div class='container'>
+  <h3>Test</h3>
+  <form>
+    <a href=# id=test>
+      <button class='btn btn-default'>Test</button>
+    </a>
+  </form>
+</div>
+
 <a href="{{ github_url }}" class="github-corner" target="_blank" title="Star me on Github">
   <svg width="80px" height="80px" viewBox="0 0 250 250"
        style="fill:#4db6ac; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
@@ -23,6 +51,7 @@
 </a>
 <div class="container" style="margin: 0 auto;">
   <div class="row">
+
     <div class="col-md-3  col-sm-3" style="background: #F5F5F5;">
       <h1 class="topic">JSON 2 HTML</h1>
       <div id="details">
@@ -42,6 +71,7 @@
         href="http://fortawesome.github.io/Font-Awesome/3.2.1/">Font-awesome icon library</a>.
       </div>
     </div>
+
     <div class="col-md-9  col-sm-9">
       <h2 class="description">JSON to Human friendly Tabular format</h2>
       <br/>
@@ -81,8 +111,8 @@
                 placeholder="HTML Generated Table Code for Copy/Share purposes" readonly></textarea>
 
       {% if disqus.show %}
-        {% from "api/disqus_helper.html" import install_disqus %}
-        {{ install_disqus(disqus) }}
+      {% from "api/disqus_helper.html" import install_disqus %}
+      {{ install_disqus(disqus) }}
       {% endif %}
 
       <footer>
